@@ -2,6 +2,8 @@
 
 > Private, frictionless, and offline-first personal expense tracking for Android.
 
+[![GitHub Release](https://img.shields.io/github/v/release/SuvarneshKM/paisa?logo=github&color=34A853)](https://github.com/SuvarneshKM/paisa/releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-Release%20APK-brightgreen?logo=android&logoColor=white)](https://github.com/SuvarneshKM/paisa/releases/latest)
 [![Android](https://img.shields.io/badge/Android-8.0%2B%20(API%2026%2B)-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.2-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-BOM%202026-4285F4?logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
@@ -13,6 +15,9 @@
 ## Overview
 
 **Paisa** is an open-source, local-first personal finance and expense manager for Android. It is engineered from the ground up around a strict privacy model: **zero internet permissions**, **zero remote servers**, and **zero tracking**.
+
+> [!TIP]
+> **Download Ready-to-Install APK**: You can download the latest signed release APK directly from [GitHub Releases](https://github.com/SuvarneshKM/paisa/releases/latest).
 
 Managing finances should never require handing over bank credentials or uploading bank transaction feeds to cloud servers. Paisa tracks income and expenses through fast manual entry or automated incoming bank SMS transaction alerts, processed entirely on-device in volatile memory.
 
@@ -41,6 +46,32 @@ Paisa strikes the ideal balance on Android:
 | Add Expense | 1-Tap Categorization | Settings & Privacy |
 | :---: | :---: | :---: |
 | ![Add Expense](docs/screenshots/04_add_transaction.png) | ![1-Tap Categorization](docs/screenshots/05_category_notification.png) | ![Settings & Privacy](docs/screenshots/06_privacy_masked.png) |
+
+---
+
+## Download & Releases
+
+Download the latest production release directly from [GitHub Releases](https://github.com/SuvarneshKM/paisa/releases/latest).
+
+### Installation
+1. Download `paisa-vX.Y.Z.apk` from the latest release assets.
+2. Open the downloaded APK on your Android device (Android 8.0+ / API 26+ required).
+3. If prompted by your browser or file manager, enable **Install unknown apps**.
+4. (Optional) Verify SHA-256 package checksum against `SHA256SUMS.txt`:
+   ```bash
+   shasum -a 256 paisa-vX.Y.Z.apk
+   ```
+
+### Publishing Future Releases (Maintainers)
+New releases are built, signed, and published automatically via GitHub Actions:
+1. Update `versionCode` and `versionName` in [`app/build.gradle.kts`](app/build.gradle.kts) and document changes in [`CHANGELOG.md`](CHANGELOG.md).
+2. Create and push a git version tag:
+   ```bash
+   git tag v1.2.0
+   git push origin v1.2.0
+   ```
+3. The [Release Workflow](.github/workflows/release.yml) automatically builds the signed APK, generates SHA-256 checksums, and publishes the GitHub Release.
+4. Alternatively, dispatch manually from GitHub's **Actions** tab $\rightarrow$ **Release APK** $\rightarrow$ **Run workflow**.
 
 ---
 
