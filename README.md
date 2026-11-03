@@ -92,25 +92,25 @@ Read our complete [Privacy Policy](PRIVACY.md) and [Security Policy](SECURITY.md
 
 ```mermaid
 flowchart TD
-    SMS[Incoming SMS Telephony Broadcast] --> OptIn{SMS Detection Enabled & Permission Granted?}
-    OptIn -- No --> Discard[Ignore & Return]
-    OptIn -- Yes --> Parser[BankSmsParser (In-Memory)]
+    SMS["Incoming SMS Telephony Broadcast"] --> OptIn{"SMS Detection Enabled & Permission Granted?"}
+    OptIn -- No --> Discard["Ignore & Return"]
+    OptIn -- Yes --> Parser["BankSmsParser (In-Memory)"]
     
-    Parser --> RejectCheck{OTP / Promo / Payment Request / Failed?}
-    RejectCheck -- Yes --> DropSMS[Discard Ephemerally]
-    RejectCheck -- No --> Extract[Extract Amount, Merchant, Last 4 Digits, UPI Ref]
+    Parser --> RejectCheck{"OTP / Promo / Payment Request / Failed?"}
+    RejectCheck -- Yes --> DropSMS["Discard Ephemerally"]
+    RejectCheck -- No --> Extract["Extract Amount, Merchant, Last 4 Digits, UPI Ref"]
     
-    Extract --> MatchAccount[Match Account by Last 4 Digits & Bank Name]
-    MatchAccount --> DedupCheck{Transaction Already Logged?}
-    DedupCheck -- Yes --> DropDuplicate[Ignore Duplicate SMS]
-    DedupCheck -- No --> SaveTx[Store Transaction in Room DB]
+    Extract --> MatchAccount["Match Account by Last 4 Digits & Bank Name"]
+    MatchAccount --> DedupCheck{"Transaction Already Logged?"}
+    DedupCheck -- Yes --> DropDuplicate["Ignore Duplicate SMS"]
+    DedupCheck -- No --> SaveTx["Store Transaction in Room DB"]
     
-    SaveTx --> NotifOptIn{Notifications Enabled?}
-    NotifOptIn -- Yes --> SuggestEngine[CategorySuggestionEngine (Tier + Learned + Keywords)]
-    SuggestEngine --> PostNotif[Post Notification with 2 Quick Category Action Chips]
-    PostNotif --> ActionTap[User Taps Category Chip]
-    ActionTap --> Receiver[TransactionActionReceiver Updates Room]
-    NotifOptIn -- No --> Done[Transaction Saved as Uncategorized]
+    SaveTx --> NotifOptIn{"Notifications Enabled?"}
+    NotifOptIn -- Yes --> SuggestEngine["CategorySuggestionEngine (Tier + Learned + Keywords)"]
+    SuggestEngine --> PostNotif["Post Notification with 2 Quick Category Action Chips"]
+    PostNotif --> ActionTap["User Taps Category Chip"]
+    ActionTap --> Receiver["TransactionActionReceiver Updates Room"]
+    NotifOptIn -- No --> Done["Transaction Saved as Uncategorized"]
 ```
 
 ---
