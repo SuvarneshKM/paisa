@@ -1,0 +1,71 @@
+name: Bug Report
+description: Create a report to help us fix a bug or unexpected behavior in Paisa
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue with Paisa! Please ensure this report does not contain real bank account numbers, personal SMS contents, passwords, or personally identifiable information.
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe what happened...
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Steps to Reproduce
+      description: Detailed step-by-step instructions to reproduce the behavior.
+      placeholder: |
+        1. Open Paisa
+        2. Tap on ...
+        3. Enter ...
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+      placeholder: What should have happened...
+    validations:
+      required: true
+  - type: textarea
+    id: sms_snippet
+    attributes:
+      label: Bank SMS Format (If applicable)
+      description: |
+        If this is an SMS parsing failure, provide a **SANITIZED, SYNTHETIC** example of the bank SMS.
+        **CRITICAL**: Redact all real phone numbers, full account numbers, real UPI transaction references, and names!
+      placeholder: "e.g. Dear SBI UPI User, A/C 1234 debited by 250.00 on 24-Oct-26 at MERCHANT Ref 123456789012"
+    validations:
+      required: false
+  - type: input
+    id: device_info
+    attributes:
+      label: Device & OS
+      description: What Android device model and OS version are you using?
+      placeholder: e.g. Pixel 8, Android 15 (API 35) / Samsung Galaxy S23, One UI 6
+    validations:
+      required: true
+  - type: input
+    id: app_version
+    attributes:
+      label: App Version
+      description: What version of Paisa are you running?
+      placeholder: e.g. 1.1.0 (versionCode 2)
+    validations:
+      required: true
+  - type: checkboxes
+    id: privacy_confirmation
+    attributes:
+      label: Privacy Check
+      description: Confirm that no confidential or sensitive financial data is included.
+      options:
+        - label: I confirm that this report contains NO real bank account numbers, passwords, OTPs, or personally identifiable information.
+          required: true

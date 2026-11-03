@@ -1,0 +1,43 @@
+# Built application files
+*.apk
+*.aab
+
+# Gradle files
+.gradle/
+build/
+*/build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log files
+*.log
+
+# Android Studio / IntelliJ IDEA
+.idea/
+*.iml
+.cxx/
+.externalNativeBuild/
+captures/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Keystores & Signing credentials
+*.keystore
+*.jks
+keystore.properties
+signing.properties
+
+# Local SQLite databases & dumps
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+dump.xml

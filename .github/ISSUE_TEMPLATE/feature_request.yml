@@ -1,0 +1,40 @@
+name: Feature Request
+description: Suggest an idea or enhancement for Paisa
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting an improvement for Paisa! Please remember that Paisa is committed to an **offline-first, zero-network architecture**. Any proposals requiring remote servers, cloud accounts, or third-party web APIs cannot be accepted.
+  - type: textarea
+    id: problem_statement
+    attributes:
+      label: Is your feature request related to a problem?
+      description: A clear and concise description of the problem or limitation you encountered.
+      placeholder: I always struggle when...
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Describe the solution you'd like
+      description: A clear and concise description of what you want to happen and how it fits into Paisa's offline model.
+      placeholder: Add support for...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives_considered
+    attributes:
+      label: Describe alternatives you've considered
+      description: Any alternative solutions or workarounds you've thought about.
+      placeholder: I also thought about...
+    validations:
+      required: false
+  - type: checkboxes
+    id: architecture_alignment
+    attributes:
+      label: Architectural Alignment
+      options:
+        - label: I understand that Paisa operates strictly offline with zero network permissions.
+          required: true
