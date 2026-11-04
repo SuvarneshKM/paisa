@@ -97,11 +97,36 @@ class SmsTransactionProcessor(
                         note = "[Needs Review] Ambiguous account match ($candidatesList)$extra"
                     }
                     is AccountMatchResult.NoMatch -> {
-                        // Pick primary account or first available, mark for review
-                        targetAccount = accounts.firstOrNull { it.isPrimary } ?: accounts.first()
-                        status = TransactionStatus.REVIEW_NEEDED
-                        val extra = if (!parsed.merchantOrBeneficiary.isNullOrBlank()) " • ${parsed.merchantOrBeneficiary}" else ""
-                        note = "[Needs Review] Unmatched account ending in ${parsed.accountLastFourDigits}$extra"
+                        // Automatically discover and create an account for this card/account
+                        // so that transactions are NEVER mistakenly attributed to or deducted from
+                        // the user's primary or other accounts.
+                        val bankInfo = AccountMatcher.getBankDetails(sender, parsed.accountLastFourDigits)
+                        val newAccountId = repository.createAccount(
+                            bankName = bankInfo.bankName,
+                            nickname = bankInfo.nickname,
+                            lastFourDigits = parsed.accountLastFourDigits,
+                            openingBalancePaise = 0L,
+                            reconciledBalancePaise = parsed.availableBalancePaise,
+                            accountType = "SAVINGS",
+                            isPrimary = false,
+                            bankIdentifier = bankInfo.bankIdentifier,
+                            themeId = bankInfo.themeId
+                        )
+                        targetAccount = repository.getAccountById(newAccountId)
+                            ?: BankAccountEntity(
+                                id = newAccountId,
+                                bankName = bankInfo.bankName,
+                                nickname = bankInfo.nickname,
+                                lastFourDigits = parsed.accountLastFourDigits,
+                                openingBalancePaise = 0L,
+                                reconciledBalancePaise = parsed.availableBalancePaise,
+                                accountType = "SAVINGS",
+                                isPrimary = false,
+                                bankIdentifier = bankInfo.bankIdentifier,
+                                themeId = bankInfo.themeId
+                            )
+                        status = TransactionStatus.PENDING
+                        note = parsed.merchantOrBeneficiary
                     }
                 }
 
@@ -132,8 +157,8 @@ class SmsTransactionProcessor(
                     note = note
                 )
 
-                // 6. Balance reconciliation if exact match and available balance present
-                if (matchResult is AccountMatchResult.Exact && parsed.availableBalancePaise != null) {
+                // 6. Balance reconciliation if exact match or newly created account and available balance present
+                if ((matchResult is AccountMatchResult.Exact || matchResult is AccountMatchResult.NoMatch) && parsed.availableBalancePaise != null) {
                     repository.reconcileAccount(targetAccount.id, parsed.availableBalancePaise)
                 }
 

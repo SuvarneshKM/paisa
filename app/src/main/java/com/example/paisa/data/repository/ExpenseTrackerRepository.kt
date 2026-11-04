@@ -73,6 +73,10 @@ class ExpenseTrackerRepository(
         bankAccountDao.getAll()
     }
 
+    suspend fun getAccountById(accountId: Long): BankAccountEntity? = withContext(Dispatchers.IO) {
+        bankAccountDao.getById(accountId)
+    }
+
     suspend fun getAllCategories(): List<CategoryEntity> = withContext(Dispatchers.IO) {
         categoryDao.getAll()
     }

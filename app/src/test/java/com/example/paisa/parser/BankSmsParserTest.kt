@@ -245,6 +245,51 @@ class BankSmsParserTest {
     }
 
     @Test
+    fun parse_promotionalVoucherCredit_isRejectedAsPromotional() {
+        val sms = "Congratulations! Your HDFC Bank Card ending 7150 has been credited with an Amazon Gift Voucher worth Rs 500. Claim now: bit.ly/hdfcvoucher"
+        val result = parser.parse(sms)
+
+        assertTrue(result is SmsParseResult.Rejected)
+        assertEquals(RejectionReason.PROMOTIONAL_OR_OFFER, (result as SmsParseResult.Rejected).reason)
+    }
+
+    @Test
+    fun parse_rewardPointsCredited_isRejectedAsPromotional() {
+        val sms = "Card ending 7150 has been credited with 500 Reward Points on your recent transaction. Redeem at smartbuy."
+        val result = parser.parse(sms)
+
+        assertTrue(result is SmsParseResult.Rejected)
+        assertEquals(RejectionReason.PROMOTIONAL_OR_OFFER, (result as SmsParseResult.Rejected).reason)
+    }
+
+    @Test
+    fun parse_cashPointsCredited_isRejectedAsPromotional() {
+        val sms = "1,000 CashPoints credited to your HDFC Bank Card ending 7150. Login to NetBanking to redeem."
+        val result = parser.parse(sms)
+
+        assertTrue(result is SmsParseResult.Rejected)
+        assertEquals(RejectionReason.PROMOTIONAL_OR_OFFER, (result as SmsParseResult.Rejected).reason)
+    }
+
+    @Test
+    fun parse_discountCouponPromo_isRejectedAsPromotional() {
+        val sms = "Get a discount voucher of Rs. 250 on your Card ending 7150. Use code SAVE250. T&C apply."
+        val result = parser.parse(sms)
+
+        assertTrue(result is SmsParseResult.Rejected)
+        assertEquals(RejectionReason.PROMOTIONAL_OR_OFFER, (result as SmsParseResult.Rejected).reason)
+    }
+
+    @Test
+    fun parse_cashbackVoucherPromo_isRejectedAsPromotional() {
+        val sms = "Enjoy Rs 500 cashback voucher credited on HDFC Bank Card ending 7150. Redeem now."
+        val result = parser.parse(sms)
+
+        assertTrue(result is SmsParseResult.Rejected)
+        assertEquals(RejectionReason.PROMOTIONAL_OR_OFFER, (result as SmsParseResult.Rejected).reason)
+    }
+
+    @Test
     fun parse_balanceInquiryOnly_isRejectedAsBalanceInquiry() {
         val sms = "Your available balance for A/C XX4821 is INR 45,210.00 as on 26-Oct-26."
         val result = parser.parse(sms)

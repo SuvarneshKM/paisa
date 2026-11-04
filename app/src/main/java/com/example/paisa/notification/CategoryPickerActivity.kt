@@ -1,5 +1,6 @@
 package com.example.paisa.notification
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -47,6 +48,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.paisa.MainActivity
 import com.example.paisa.model.CategoryIconRegistry
 import com.example.paisa.sms.CategorySuggestionEngine
 import androidx.compose.ui.unit.sp
@@ -69,7 +71,7 @@ class CategoryPickerActivity : ComponentActivity() {
         val notificationId = intent.getIntExtra(TransactionNotificationHelper.EXTRA_NOTIFICATION_ID, -1)
 
         if (transactionId == -1L) {
-            finish()
+            navigateToHomeAndFinish()
             return
         }
 
@@ -87,16 +89,24 @@ class CategoryPickerActivity : ComponentActivity() {
                     notificationId = notificationId,
                     repository = repository,
                     onCategorySelected = { categoryName ->
-                        Toast.makeText(this, "Categorized as $categoryName", Toast.LENGTH_SHORT).show()
-                        TransactionNotificationHelper.dismissNotification(this, notificationId)
-                        finish()
+                        Toast.makeText(this@CategoryPickerActivity, "Categorized as $categoryName", Toast.LENGTH_SHORT).show()
+                        TransactionNotificationHelper.dismissNotification(this@CategoryPickerActivity, notificationId)
+                        navigateToHomeAndFinish()
                     },
                     onDismiss = {
-                        finish()
+                        navigateToHomeAndFinish()
                     }
                 )
             }
         }
+    }
+
+    private fun navigateToHomeAndFinish() {
+        val homeIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        startActivity(homeIntent)
+        finishAndRemoveTask()
     }
 }
 
@@ -112,6 +122,7 @@ fun CategoryPickerScreen(
     var account by remember { mutableStateOf<BankAccountEntity?>(null) }
     var categories by remember { mutableStateOf<List<CategoryEntity>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var isSubmitting by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -255,15 +266,23 @@ fun CategoryPickerScreen(
                                             color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.outlineVariant,
                                             shape = RoundedCornerShape(10.dp)
                                         )
-                                        .clickable {
-                                            coroutineScope.launch {
-                                                repository.updateTransactionCategory(tx.id, category.id)
-                                                CategorySuggestionEngine.getInstance(context).learn(
-                                                    merchantOrPayee = tx.note,
-                                                    categoryName = category.name,
-                                                    amountPaise = tx.amountPaise
-                                                )
-                                                onCategorySelected(category.name)
+                                        .clickable(enabled = !isSubmitting) {
+                                            if (!isSubmitting) {
+                                                isSubmitting = true
+                                                coroutineScope.launch {
+                                                    try {
+                                                        repository.updateTransactionCategory(tx.id, category.id)
+                                                        CategorySuggestionEngine.getInstance(context).learn(
+                                                            merchantOrPayee = tx.note,
+                                                            categoryName = category.name,
+                                                            amountPaise = tx.amountPaise
+                                                        )
+                                                    } catch (e: Exception) {
+                                                        // Ensure category selection callback always fires
+                                                    } finally {
+                                                        onCategorySelected(category.name)
+                                                    }
+                                                }
                                             }
                                         }
                                         .padding(horizontal = 12.dp, vertical = 10.dp)
@@ -296,6 +315,7 @@ fun CategoryPickerScreen(
                         // Cancel Button
                         Button(
                             onClick = onDismiss,
+                            enabled = !isSubmitting,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(46.dp),

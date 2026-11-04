@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -224,19 +225,35 @@ class SmsIntegrationTest {
     }
 
     @Test
-    fun processIncomingSms_unmatchedAccount_assignsToPrimaryAccountWithReviewNeeded() = runBlocking {
-        // SMS for account ending in 7777 (not in saved accounts)
+    fun processIncomingSms_unmatchedAccount_createsNewAccountWithoutPollutingPrimaryAccount() = runBlocking {
+        // User has primary account (Salary Account ending in 4821, id=1L).
+        // Incoming SMS for an unadded account ending in 7777:
         val sms = "Rs 300.00 debited from A/C XX7777 on 25-Oct-26 at CHAI POINT. Ref: CHAI999"
         val outcome = processor.processIncomingSms(smsBody = sms, sender = "AD-HDFCBK")
 
         assertTrue(outcome is SmsProcessingOutcome.Created)
         val created = outcome as SmsProcessingOutcome.Created
-        assertTrue(created.isReviewNeeded)
+        assertEquals("7777", created.accountLastFourDigits)
+        assertEquals("HDFC •••• 7777", created.accountNickname)
+        assertFalse(created.isReviewNeeded)
 
         val savedTx = fakeTransactionDao.transactions.first { it.id == created.transactionId }
-        assertEquals(1L, savedTx.accountId) // Attached to primary account
-        assertEquals(TransactionStatus.REVIEW_NEEDED, savedTx.status)
-        assertTrue(savedTx.note?.contains("[Needs Review] Unmatched account ending in 7777") == true)
+        // Must NOT be attached to the primary account (id=1L)
+        assertNotEquals(1L, savedTx.accountId)
+        assertEquals(TransactionStatus.PENDING, savedTx.status)
+        assertEquals("CHAI POINT", savedTx.note)
+
+        // Verify that a new account for 7777 was created with correct bank details
+        val newAccount = fakeBankAccountDao.getById(savedTx.accountId)
+        assertNotNull(newAccount)
+        assertEquals("7777", newAccount?.lastFourDigits)
+        assertEquals("HDFC Bank", newAccount?.bankName)
+        assertFalse(newAccount?.isPrimary ?: true)
+
+        // Verify primary account was never modified
+        val primaryAcc = fakeBankAccountDao.getById(1L)
+        assertEquals("Salary Account", primaryAcc?.nickname)
+        assertEquals(5000000L, primaryAcc?.openingBalancePaise)
     }
 
     @Test

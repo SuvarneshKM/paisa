@@ -17,7 +17,7 @@ class DefaultBankSmsParser : BankSmsParser {
 
         // OTP detection
         private val OTP_REGEX = Regex(
-            """(?i)\b(?:otp|one[\s-]?time[\s-]?password|verification[\s-]?code|secret[\s-]?code|login[\s-]?otp)\b|(?:\buse\s+(?:code|otp)\b)|(?:\bnever\s+share\b)|(?:\bdo\s+not\s+share\b)|(?:\bvalid\s+for\s+\d+\s*(?:mins?|minutes?|secs?)\b)"""
+            """(?i)\b(?:otp|one[\s-]?time[\s-]?password|verification[\s-]?code|secret[\s-]?code|login[\s-]?otp)\b|(?:\buse\s+(?:code\s+\d{4,8}|otp)\b)|(?:\bnever\s+share\b)|(?:\bdo\s+not\s+share\b)|(?:\bvalid\s+for\s+\d+\s*(?:mins?|minutes?|secs?)\b)"""
         )
 
         // Failed / Declined transactions
@@ -30,9 +30,20 @@ class DefaultBankSmsParser : BankSmsParser {
             """(?i)\b(?:has\s+requested|requested\s+(?:money|rs|inr|payment)|collect\s+request|authorise\s+payment|authorize\s+payment|request\s+to\s+pay|approve\s+payment|approval\s+pending)\b"""
         )
 
-        // Promotional / Loan offers
+        // Promotional / Offer / Voucher / Reward Points / Marketing detection
         private val PROMOTIONAL_REGEX = Regex(
-            """(?i)\b(?:pre-approved|apply\s+now|congratulations|claim\s+now|special\s+offer|upgrade\s+your\s+card|flat\s+\d+%\s+off|exclusive\s+offer|instant\s+loan|eligible\s+for\s+(?:loan|card))\b"""
+            """(?i)\b(?:""" +
+            """voucher|gift[\s-]?card|gift[\s-]?voucher|coupon|promo[\s-]?code|discount[\s-]?code|""" +
+            """reward[\s-]?points?|cashpoints?|bonus[\s-]?points?|reward[\s-]?pts|""" +
+            """(?:points?|pts)\s+credited|credited\s+with\s+(?:[0-9,]+\s+)?(?:reward\s+)?points?|""" +
+            """earned\s+(?:[0-9,]+\s+)?(?:reward\s+|cash)?points?|""" +
+            """pre[\s-]?approved|apply\s+now|congratulations|congrats|claim\s+(?:now|your|at)|""" +
+            """special\s+offer|upgrade\s+your\s+card|flat\s+\d+%\s+off|exclusive\s+offer|""" +
+            """instant\s+loan|eligible\s+for\s+(?:loan|card|limit)|credit\s+limit\s+increase|""" +
+            """worth\s+(?:rs\.?|inr|₹)|won\b|win\b|stand\s+a\s+chance|redeem(?:\s+now)?|redemption|""" +
+            """complimentary|cashback\s+(?:voucher|coupon|offer|points?)|t&c\s+apply|terms\s+and\s+conditions|""" +
+            """use\s+code|scratch\s+card|refer\s+and\s+earn|survey|annual\s+fee\s+waiver""" +
+            """)\b"""
         )
 
         // --- 2. Available Balance Pattern ---

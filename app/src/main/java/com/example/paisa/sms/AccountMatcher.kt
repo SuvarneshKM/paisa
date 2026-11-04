@@ -1,6 +1,14 @@
 package com.example.paisa.sms
 
 import com.example.paisa.data.local.entity.BankAccountEntity
+import com.example.paisa.model.BankPresets
+
+data class DiscoveredBankInfo(
+    val bankName: String,
+    val nickname: String,
+    val bankIdentifier: String,
+    val themeId: String
+)
 
 sealed class AccountMatchResult {
     data class Exact(val account: BankAccountEntity) : AccountMatchResult()
@@ -19,7 +27,11 @@ object AccountMatcher {
         "PNB" to listOf("PNB", "PNBBNK"),
         "BOB" to listOf("BOB", "BARODA"),
         "CANARA" to listOf("CANARA", "CNRB"),
-        "INDUSIND" to listOf("INDUSIND", "INDB")
+        "INDUSIND" to listOf("INDUSIND", "INDB"),
+        "FEDERAL" to listOf("FED", "FEDERAL"),
+        "IDFC" to listOf("IDFC", "IDFCFB"),
+        "SIB" to listOf("SIB", "SIBL"),
+        "YES" to listOf("YES", "YESBNK")
     )
 
     fun match(
@@ -66,6 +78,35 @@ object AccountMatcher {
             }
         }
         return null
+    }
+
+    fun getBankDetails(sender: String?, lastFour: String): DiscoveredBankInfo {
+        val detectedKey = detectBankFromSender(sender)
+        val preset = if (detectedKey != null) {
+            BankPresets.findPresetByFreeText(detectedKey)
+        } else {
+            BankPresets.PRESET_OTHER
+        }
+
+        val bankName = if (preset != BankPresets.PRESET_OTHER) {
+            preset.displayName
+        } else if (!detectedKey.isNullOrBlank()) {
+            detectedKey
+        } else {
+            "Bank Account"
+        }
+
+        val shortName = if (preset != BankPresets.PRESET_OTHER) preset.shortName else bankName
+        val nickname = "$shortName •••• $lastFour"
+        val themeId = preset.defaultThemeId
+        val bankIdentifier = preset.identifier
+
+        return DiscoveredBankInfo(
+            bankName = bankName,
+            nickname = nickname,
+            bankIdentifier = bankIdentifier,
+            themeId = themeId
+        )
     }
 
     private fun isBankEvidenceMatching(bankName: String, sender: String): Boolean {

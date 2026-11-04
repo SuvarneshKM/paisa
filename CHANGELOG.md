@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-11-05
+
+### Fixed
+- **Unmatched Account Pollution**: Resolved issue where incoming SMS transactions for unadded cards or accounts were assigned to the user's primary account (e.g. `•••• 7150`), modifying its balance. Unadded accounts are now dynamically discovered from sender evidence and created as independent accounts with zero balance corruption on existing accounts.
+- **Bank Promotional & Voucher Rejection**: Expanded SMS parser rejection filters to accurately identify and reject promotional bank SMS mentioning vouchers, gift cards, coupons, reward points, and CashPoints, preventing spurious financial credit records.
+- **Category Picker Notification Screen Navigation**: Fixed issue where `CategoryPickerActivity` opened from notification quick actions did not dismiss after category selection; now cleanly transitions to `MainActivity` (home screen) and finishes the task.
+
+---
+
 ## [1.1.0] - 2026-11-03
 
 ### Added
